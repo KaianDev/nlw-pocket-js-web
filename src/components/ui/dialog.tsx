@@ -40,7 +40,10 @@ export const DialogContent = (props: DialogPrimitive.DialogContentProps) => {
 
 export const DialogTitle = (props: DialogPrimitive.DialogTitleProps) => {
   return (
-    <DialogPrimitive.DialogTitle {...props} className="text-lg font-semibold" />
+    <DialogPrimitive.DialogTitle
+      {...props}
+      className="text-lg font-semibold tracking-tight"
+    />
   )
 }
 
