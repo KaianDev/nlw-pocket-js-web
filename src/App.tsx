@@ -2,6 +2,7 @@ import { PlusIcon } from "lucide-react"
 
 import logo from "./assets/logo.svg"
 import illustrationLetStart from "./assets/illustration-let-start.svg"
+import { Button } from "./components/ui/button"
 
 export const App = () => {
   return (
@@ -14,12 +15,10 @@ export const App = () => {
           mesmo?
         </p>
 
-        <button
-          type="button"
-          className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-violet-500 text-violet-50 text-sm tracking-tight font-medium hover:bg-violet-600">
+        <Button>
           <PlusIcon className="size-4" />
           Cadastrar meta
-        </button>
+        </Button>
       </div>
     </h1>
   )
