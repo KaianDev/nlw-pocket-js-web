@@ -13,6 +13,11 @@ import logo from "./assets/logo.svg"
 import illustrationLetStart from "./assets/illustration-let-start.svg"
 import { Input } from "./components/ui/input"
 import { Label } from "./components/ui/label"
+import {
+  RadioGroup,
+  RadioGroupIndicator,
+  RadioGroupItem,
+} from "./components/ui/radio-group"
 
 export const App = () => {
   return (
@@ -50,13 +55,40 @@ export const App = () => {
           </div>
 
           <form className="flex flex-col justify-between h-full">
-            <div>
+            <div className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="title">Qual a atividade?</Label>
                 <Input
                   id="title"
+                  autoFocus
                   placeholder="Praticar exercícios, meditar, etc..."
                 />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="title">Quantas vezes na semana?</Label>
+                <RadioGroup>
+                  <RadioGroupItem value="1">
+                    <RadioGroupIndicator />
+                    <span className="text-sm font-medium text-zinc-300">
+                      1x na semana
+                    </span>
+                    <span className="text-lg">🥱</span>
+                  </RadioGroupItem>
+                  <RadioGroupItem value="2">
+                    <RadioGroupIndicator />
+                    <span className="text-sm font-medium text-zinc-300">
+                      2x na semana
+                    </span>
+                    <span className="text-lg">🙂</span>
+                  </RadioGroupItem>
+                  <RadioGroupItem value="3">
+                    <RadioGroupIndicator />
+                    <span className="text-sm font-medium text-zinc-300">
+                      1x na semana
+                    </span>
+                    <span className="text-lg">😎</span>
+                  </RadioGroupItem>
+                </RadioGroup>
               </div>
             </div>
 
