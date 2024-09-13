@@ -30,7 +30,7 @@ export const Summary = () => {
   )
 
   return (
-    <main className="max-w-[400px] w-full mx-auto pt-10 flex flex-col gap-6">
+    <main className="max-w-[480px] w-full mx-auto py-10 flex flex-col gap-6">
       <header className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <InOrbitIcon />
