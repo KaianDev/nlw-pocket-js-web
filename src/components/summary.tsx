@@ -9,7 +9,7 @@ import { DialogTrigger } from "./ui/dialog"
 import { InOrbitIcon } from "./ui/in-orbit-icon"
 import { Progress, ProgressIndicator } from "./ui/progress-bar"
 import { Separator } from "./ui/separator"
-import { OutlineButton } from "./ui/outline-button"
+import { PendingGoals } from "./pending-goals"
 
 import { useSummary } from "../hooks/use-summary"
 
@@ -67,24 +67,7 @@ export const Summary = () => {
 
       <Separator />
 
-      <div className="flex items-center flex-wrap gap-2">
-        <OutlineButton>
-          <PlusIcon className="size-4 text-zinc-400" />
-          Meditar
-        </OutlineButton>
-        <OutlineButton>
-          <PlusIcon className="size-4 text-zinc-400" />
-          Estudar
-        </OutlineButton>
-        <OutlineButton>
-          <PlusIcon className="size-4 text-zinc-400" />
-          Fazer companhia a esposa
-        </OutlineButton>
-        <OutlineButton disabled>
-          <PlusIcon className="size-4 text-zinc-400" />
-          Acordar cedo
-        </OutlineButton>
-      </div>
+      <PendingGoals />
 
       <div className="space-y-6">
         <h2 className="text-xl font-medium text-zinc-100">Sua semana</h2>
