@@ -1,4 +1,8 @@
+import { z } from "zod"
+import { Controller, useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { XIcon } from "lucide-react"
+import { useQueryClient } from "@tanstack/react-query"
 
 import { Input } from "./ui/input"
 import { Label } from "./ui/label"
@@ -14,8 +18,38 @@ import {
   DialogTitle,
 } from "./ui/dialog"
 import { Button } from "./ui/button"
+import { desiredWeeklyFrequencyOptions } from "../data/desired-weekly-frequency-options"
+import { createGoal } from "../http/create-goal"
 
-export const CreateGoal = () => {
+const createGoalFormSchema = z.object({
+  title: z.string().min(1, "Informe a atividade que deseja realizar"),
+  desiredWeeklyFrequency: z.coerce.number().min(1).max(7),
+})
+
+interface CreateGoalProps {
+  closeDialog(): void
+}
+
+export const CreateGoal = ({ closeDialog }: CreateGoalProps) => {
+  const queryClient = useQueryClient()
+
+  const { register, formState, control, handleSubmit, reset } = useForm<
+    z.infer<typeof createGoalFormSchema>
+  >({
+    resolver: zodResolver(createGoalFormSchema),
+  })
+
+  const handleCreateGoalSubmit = handleSubmit(
+    async ({ desiredWeeklyFrequency, title }) => {
+      await createGoal({ desiredWeeklyFrequency, title })
+      queryClient.invalidateQueries({ queryKey: ["summary"] })
+      queryClient.invalidateQueries({ queryKey: ["pending-goals"] })
+
+      reset()
+      closeDialog()
+    }
+  )
+
   return (
     <DialogContent>
       <div className="flex flex-col gap-6 h-full">
@@ -32,7 +66,9 @@ export const CreateGoal = () => {
           </DialogDescription>
         </div>
 
-        <form className="flex flex-col justify-between h-full">
+        <form
+          onSubmit={handleCreateGoalSubmit}
+          className="flex flex-col justify-between h-full">
           <div className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="title">Qual a atividade?</Label>
@@ -40,33 +76,36 @@ export const CreateGoal = () => {
                 id="title"
                 autoFocus
                 placeholder="Praticar exercícios, meditar, etc..."
+                {...register("title")}
               />
+              {formState.errors.title && (
+                <p className="text-xs text-red-400">
+                  {formState.errors.title.message}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="title">Quantas vezes na semana?</Label>
-              <RadioGroup>
-                <RadioGroupItem value="1">
-                  <RadioGroupIndicator />
-                  <span className="text-sm font-medium text-zinc-300 leading-none">
-                    1x na semana
-                  </span>
-                  <span className="text-lg">🥱</span>
-                </RadioGroupItem>
-                <RadioGroupItem value="2">
-                  <RadioGroupIndicator />
-                  <span className="text-sm font-medium text-zinc-300 leading-none">
-                    2x na semana
-                  </span>
-                  <span className="text-lg">🙂</span>
-                </RadioGroupItem>
-                <RadioGroupItem value="3">
-                  <RadioGroupIndicator />
-                  <span className="text-sm font-medium text-zinc-300 leading-none">
-                    1x na semana
-                  </span>
-                  <span className="text-lg">😎</span>
-                </RadioGroupItem>
-              </RadioGroup>
+              <Controller
+                control={control}
+                defaultValue={3}
+                name="desiredWeeklyFrequency"
+                render={({ field }) => (
+                  <RadioGroup
+                    onValueChange={field.onChange}
+                    value={String(field.value)}>
+                    {desiredWeeklyFrequencyOptions.map((option) => (
+                      <RadioGroupItem key={option.value} value={option.value}>
+                        <RadioGroupIndicator />
+                        <span className="text-sm font-medium text-zinc-300 leading-none">
+                          {option.title}
+                        </span>
+                        <span className="text-lg">{option.emoji}</span>
+                      </RadioGroupItem>
+                    ))}
+                  </RadioGroup>
+                )}
+              />
             </div>
           </div>
 
