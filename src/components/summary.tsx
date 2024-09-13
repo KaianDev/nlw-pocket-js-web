@@ -1,4 +1,9 @@
+import dayjs from "dayjs"
+import ptBR from "dayjs/locale/pt-br"
+import isToday from "dayjs/plugin/isToday"
+import isYesterday from "dayjs/plugin/isYesterday"
 import { CheckCircle2Icon, PlusIcon } from "lucide-react"
+
 import { Button } from "./ui/button"
 import { DialogTrigger } from "./ui/dialog"
 import { InOrbitIcon } from "./ui/in-orbit-icon"
@@ -6,13 +11,32 @@ import { Progress, ProgressIndicator } from "./ui/progress-bar"
 import { Separator } from "./ui/separator"
 import { OutlineButton } from "./ui/outline-button"
 
+import { useSummary } from "../hooks/use-summary"
+
+dayjs.locale(ptBR)
+dayjs.extend(isToday)
+dayjs.extend(isYesterday)
+
 export const Summary = () => {
+  const { data } = useSummary()
+
+  if (!data) return null
+
+  const firstDayOfWeek = dayjs().startOf("week").format("D MMM")
+  const lastDayOfWeek = dayjs().endOf("week").format("D MMM")
+
+  const completedPercentage = Math.round(
+    (data.totalCompletions / data.totalDesiredFrequency) * 100
+  )
+
   return (
     <main className="max-w-[400px] w-full mx-auto pt-10 flex flex-col gap-6">
       <header className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <InOrbitIcon />
-          <h1 className="text-lg font-medium">05 a 12 de Setembro</h1>
+          <h1 className="text-lg font-medium capitalize">
+            {firstDayOfWeek} - {lastDayOfWeek}
+          </h1>
         </div>
         <DialogTrigger asChild>
           <Button size="sm">
@@ -23,17 +47,21 @@ export const Summary = () => {
       </header>
 
       <div className="space-y-3">
-        <Progress value={8} max={15}>
-          <ProgressIndicator style={{ width: "50%" }} />
+        <Progress
+          value={data.totalCompletions}
+          max={data.totalDesiredFrequency}>
+          <ProgressIndicator style={{ width: `${completedPercentage}%` }} />
         </Progress>
 
         <div className="flex items-center justify-between">
           <p className="text-zinc-400 text-sm">
-            Você completou <span className="text-zinc-100">8</span> de{" "}
-            <span className="text-zinc-100">15</span> metas nessa semana.
+            Você completou{" "}
+            <span className="text-zinc-100">{data.totalCompletions}</span> de{" "}
+            <span className="text-zinc-100">{data.totalDesiredFrequency}</span>{" "}
+            metas nessa semana.
           </p>
 
-          <span className="text-sm text-zinc-400">58%</span>
+          <span className="text-sm text-zinc-400">{completedPercentage}%</span>
         </div>
       </div>
 
@@ -61,50 +89,45 @@ export const Summary = () => {
       <div className="space-y-6">
         <h2 className="text-xl font-medium text-zinc-100">Sua semana</h2>
 
-        <div className="space-y-3">
-          <h3 className="text-zinc-100 font-medium">
-            Hoje{" "}
-            <span className="text-xs text-zinc-400 font-normal">
-              (06 de agosto)
-            </span>
-          </h3>
-          <ul className="flex flex-col gap-2">
-            <li className="flex items-center gap-2">
-              <CheckCircle2Icon className="size-4 text-pink-500" />
-              <p className="text-zinc-400 text-sm">
-                Você completou "
-                <span className="text-zinc-100 font-medium">Acordar cedo</span>"
-                às "<span className="text-zinc-100">8:30h</span>"
-              </p>
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle2Icon className="size-4 text-pink-500" />
-              <p className="text-zinc-400 text-sm">
-                Você completou "
-                <span className="text-zinc-100 font-medium">Estudar</span>" às "
-                <span className="text-zinc-100">23:37h</span>"
-              </p>
-            </li>
-          </ul>
-        </div>
-        <div className="space-y-3">
-          <h3 className="text-zinc-100 font-medium">
-            Ontem{" "}
-            <span className="text-xs text-zinc-400 font-normal">
-              (05 de agosto)
-            </span>
-          </h3>
-          <ul className="flex flex-col gap-2">
-            <li className="flex items-center gap-2">
-              <CheckCircle2Icon className="size-4 text-pink-500" />
-              <p className="text-zinc-400 text-sm">
-                Você completou "
-                <span className="text-zinc-100 font-medium">Acordar cedo</span>"
-                às "<span className="text-zinc-100">7:30h</span>"
-              </p>
-            </li>
-          </ul>
-        </div>
+        {Object.entries(data.completionsByDate).map(([date, goals]) => {
+          const weekDay = dayjs(date).format("dddd")
+          const displayWeekDay = dayjs(date).isToday()
+            ? "hoje"
+            : dayjs(date).isYesterday()
+            ? "ontem"
+            : weekDay
+
+          const formattedDate = dayjs(date).format("DD[ de ]MMMM")
+
+          return (
+            <div key={date} className="space-y-3">
+              <h3 className="text-zinc-100 font-medium">
+                <span className="capitalize">{displayWeekDay}</span>{" "}
+                <span className="text-xs text-zinc-400 font-normal">
+                  ({formattedDate})
+                </span>
+              </h3>
+              <ul className="flex flex-col gap-2">
+                {goals.map((goal) => {
+                  const time = dayjs(goal.completedAt).format("HH:mm")
+
+                  return (
+                    <li key={goal.id} className="flex items-center gap-2">
+                      <CheckCircle2Icon className="size-4 text-pink-500" />
+                      <p className="text-zinc-400 text-sm">
+                        Você completou "
+                        <span className="text-zinc-100 font-medium">
+                          {goal.title}
+                        </span>
+                        " às "<span className="text-zinc-100">{time}h</span>"
+                      </p>
+                    </li>
+                  )
+                })}
+              </ul>
+            </div>
+          )
+        })}
       </div>
     </main>
   )
