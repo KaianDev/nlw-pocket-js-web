@@ -10,8 +10,8 @@ type CompletionsByDate = Record<
 >
 interface GetSummaryGoalsResponse {
   totalCompletions: number
-  totalDesiredFrequency: number
-  completionsByDate: CompletionsByDate
+  totalDesiredFrequency: number | null
+  completionsByDate: CompletionsByDate | null
 }
 
 export const getSummaryGoals = async () => {
